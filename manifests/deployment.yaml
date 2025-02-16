@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab-runner
+  namespace: gitlab-runner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitlab-runner
+  template:
+    metadata:
+      labels:
+        app: gitlab-runner
+    spec:
+      serviceAccountName: gitlab-runner
+      dnsPolicy: ClusterFirst
+      containers:
+      - name: gitlab-runner
+        image: gitlab/gitlab-runner:latest
+        command:
+          - "gitlab-runner"
+          - "run"
+          - "--config"
+          - "/etc/gitlab-runner/config.toml"
+          - "--listen-address"
+          - ":9252"                          # Enable Prometheus metrics on port 9252
+        ports:
+        - name: metrics
+          containerPort: 9252
+          protocol: TCP
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/gitlab-runner
+          readOnly: true
+        - name: token
+          mountPath: /var/run/secrets/tokens
+          readOnly: true
+      volumes:
+      - name: config-volume
+        configMap:
+          name: gitlab-runner-config
+      - name: token
+        projected:
+          sources:
+          - serviceAccountToken:
+              path: gitlab-runner-token
+              expirationSeconds: 3600
+
