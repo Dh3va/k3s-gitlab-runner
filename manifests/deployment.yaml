@@ -4,7 +4,7 @@ metadata:
   name: gitlab-runner
   namespace: gitlab-runner
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: gitlab-runner
@@ -46,4 +46,3 @@ spec:
           - serviceAccountToken:
               path: gitlab-runner-token
               expirationSeconds: 3600
-
