@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: gitlab-runner-monitor
+  namespace: monitoring # Change to your Prometheus namespace
+  labels:
+    release: prometheus # if you're using the kube-prometheus-stack helm chart
+spec:
+  selector:
+    matchLabels:
+      app: gitlab-runner # Matches the labels on your gitlab-runner Service
+  namespaceSelector:
+    matchNames:
+      - gitlab-runner # Namespace where your gitlab-runner Service is deployed
+  endpoints:
+    - port: metrics
+      interval: 30s # How often to scrape metrics
+      path: /metrics # Metric endpoint

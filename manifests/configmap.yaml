@@ -10,12 +10,17 @@ data:
       url = "https://gitlab.com/"
       token = "glrt-t3_o_rjGD_Zch9dq3w5Gu5Z"
       executor = "kubernetes"
+      
       [runners.kubernetes]
         namespace = "gitlab-runner"
         service_account = "gitlab-runner"
         poll_timeout = 600
         image = "alpine:latest"
+
+        # Ensure jobs only run on worker nodes
+        [runners.kubernetes.node_selector]
+          "kubernetes.io/role" = "worker"
+
       [runners.cache]
         path = "/cache"
         shared = true
-
